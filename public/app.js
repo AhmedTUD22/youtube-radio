@@ -42,31 +42,16 @@ function onPlayerStateChange(event) {
     stopProgressUpdate();
     isPlaying = false;
     updatePlayPauseButton();
-    updateMediaSessionState('paused');
   } else if (event.data === YT.PlayerState.PLAYING) {
     isPlaying = true;
     updatePlayPauseButton();
     startProgressUpdate();
     showEqualizer(true);
-    updateMediaSessionState('playing');
-    
-    // تفعيل نظام التشغيل في الخلفية
-    if (window.backgroundAudio) {
-      window.backgroundAudio.start();
-    }
   } else if (event.data === YT.PlayerState.PAUSED) {
     isPlaying = false;
     updatePlayPauseButton();
     stopProgressUpdate();
     showEqualizer(false);
-    updateMediaSessionState('paused');
-  }
-}
-
-// تحديث حالة Media Session
-function updateMediaSessionState(state) {
-  if ('mediaSession' in navigator) {
-    navigator.mediaSession.playbackState = state;
   }
 }
 
@@ -155,25 +140,17 @@ function updateQueue(queue) {
     queueList.innerHTML = '<li class="empty-queue">📭 القائمة فارغة - أضف فيديو للبدء!</li>';
   } else {
     queueList.innerHTML = queue.map((video, index) => `
-      <li data-index="${index}" onclick="playFromQueue(${index})" style="cursor: pointer;" title="اضغط للتشغيل">
+      <li data-index="${index}">
         <img src="${video.thumbnail}" alt="${video.title}">
         <div class="queue-item-info">
           <div class="queue-item-title">${video.title}</div>
           <div class="queue-item-channel">${video.channel || 'قناة يوتيوب'}</div>
         </div>
-        <button class="remove-btn" onclick="event.stopPropagation(); removeFromQueue(${index})">✕</button>
+        <button class="remove-btn" onclick="removeFromQueue(${index})">✕</button>
       </li>
     `).join('');
   }
 }
-
-// دالة جديدة لتشغيل أغنية من القائمة
-function playFromQueue(index) {
-  socket.emit('playFromQueue', index);
-  showNotification('▶️ جاري التشغيل...', 'success');
-}
-
-window.playFromQueue = playFromQueue;
 
 function updateOnlineUsers(count) {
   document.getElementById('onlineCount').textContent = count;
@@ -226,19 +203,6 @@ function updateProgress() {
     }
     document.getElementById('currentTime').textContent = formatTime(currentTime);
     document.getElementById('duration').textContent = formatTime(duration);
-    
-    // تحديث موضع التشغيل في Media Session
-    if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
-      try {
-        navigator.mediaSession.setPositionState({
-          duration: duration,
-          playbackRate: player.getPlaybackRate ? player.getPlaybackRate() : 1,
-          position: currentTime
-        });
-      } catch (err) {
-        // تجاهل الأخطاء
-      }
-    }
   }
 }
 
@@ -1233,17 +1197,24 @@ document.addEventListener('visibilitychange', async () => {
   }
 });
 
-// ===== التشغيل في الخلفية - حل بسيط =====
+// ===== Audio Focus - التشغيل المستمر في الخلفية =====
+// إنشاء عنصر audio مخفي للحفاظ على Audio Focus
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+let audioElement = null;
 
-// إعادة التشغيل عند العودة من الخلفية
-document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && isPlaying && isPlayerReady && player) {
-    const state = player.getPlayerState();
-    if (state !== YT.PlayerState.PLAYING) {
-      player.playVideo();
-    }
+function initAudioElement() {
+  if (!audioElement) {
+    audioElement = new Audio();
+    audioElement.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+    audioElement.loop = true;
+    audioElement.volume = 0.01; // صوت منخفض جداً
+    
+    // تشغيل صامت للحفاظ على Audio Focus
+    audioElement.play().catch(err => console.log('Audio element error:', err));
   }
-});
+}
+
+// تم نقل هذه الدالة للأعلى - لا حاجة للتكرار
 
 // ===== Background Sync - مزامنة في الخلفية =====
 if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {

@@ -100,9 +100,13 @@ function playVideo(videoData) {
     updateVideoInfo(videoData);
     updateStatus('🎵 يتم التشغيل الآن...');
     
-    // تفعيل التشغيل في الخلفية
-    if (window.backgroundAudio) {
-      window.backgroundAudio.enable();
+    // تفعيل جميع أنظمة التشغيل في الخلفية
+    if (window.backgroundPlaybackManager && !window.backgroundPlaybackManager.isActive) {
+      window.backgroundPlaybackManager.init();
+    }
+    
+    if (window.enhancedBackgroundAudio && !window.enhancedBackgroundAudio.isEnabled) {
+      window.enhancedBackgroundAudio.enable();
     }
   } else {
     setTimeout(() => playVideo(videoData), 500);
@@ -1202,24 +1206,64 @@ document.addEventListener('visibilitychange', async () => {
   }
 });
 
-// ===== Audio Focus - التشغيل المستمر في الخلفية =====
-// إنشاء عنصر audio مخفي للحفاظ على Audio Focus
-const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-let audioElement = null;
+// ===== تحسينات إضافية للتشغيل في الخلفية =====
 
-function initAudioElement() {
-  if (!audioElement) {
-    audioElement = new Audio();
-    audioElement.src = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
-    audioElement.loop = true;
-    audioElement.volume = 0.01; // صوت منخفض جداً
-    
-    // تشغيل صامت للحفاظ على Audio Focus
-    audioElement.play().catch(err => console.log('Audio element error:', err));
+// مراقبة حالة المشغل بشكل مستمر
+setInterval(() => {
+  if (isPlaying && isPlayerReady && player) {
+    try {
+      const state = player.getPlayerState();
+      // إذا كان يجب أن يكون قيد التشغيل لكنه متوقف
+      if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
+        console.log('🔄 اكتشاف توقف غير متوقع - إعادة التشغيل');
+        player.playVideo();
+      }
+    } catch (err) {
+      console.warn('⚠️ خطأ في فحص حالة المشغل:', err);
+    }
+  }
+}, 3000);
+
+// معالجة أحداث النظام
+document.addEventListener('pause', () => {
+  console.log('⚠️ حدث pause - محاولة الاستمرار');
+  if (isPlaying && isPlayerReady && player) {
+    setTimeout(() => player.playVideo(), 100);
+  }
+}, true);
+
+document.addEventListener('freeze', () => {
+  console.log('⚠️ حدث freeze - محاولة الاستمرار');
+  if (isPlaying && isPlayerReady && player) {
+    setTimeout(() => player.playVideo(), 100);
+  }
+}, true);
+
+// منع توقف الصفحة
+let lastActivity = Date.now();
+setInterval(() => {
+  lastActivity = Date.now();
+}, 1000);
+
+// إشعار المستخدم عند التشغيل في الخلفية
+function showBackgroundNotification() {
+  if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
+    new Notification('راديو يوتيوب', {
+      body: currentVideoData ? `يتم تشغيل: ${currentVideoData.title}` : 'التشغيل مستمر في الخلفية',
+      icon: currentVideoData ? currentVideoData.thumbnail : '/icon-192.png',
+      tag: 'background-playback',
+      requireInteraction: false,
+      silent: true
+    });
   }
 }
 
-// تم نقل هذه الدالة للأعلى - لا حاجة للتكرار
+// إظهار إشعار كل دقيقة أثناء التشغيل في الخلفية
+setInterval(() => {
+  if (isPlaying && document.hidden) {
+    showBackgroundNotification();
+  }
+}, 60000);
 
 // ===== Background Sync - مزامنة في الخلفية =====
 if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {

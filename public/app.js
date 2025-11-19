@@ -42,16 +42,31 @@ function onPlayerStateChange(event) {
     stopProgressUpdate();
     isPlaying = false;
     updatePlayPauseButton();
+    updateMediaSessionState('paused');
   } else if (event.data === YT.PlayerState.PLAYING) {
     isPlaying = true;
     updatePlayPauseButton();
     startProgressUpdate();
     showEqualizer(true);
+    updateMediaSessionState('playing');
+    
+    // تفعيل نظام التشغيل في الخلفية
+    if (window.backgroundAudio) {
+      window.backgroundAudio.start();
+    }
   } else if (event.data === YT.PlayerState.PAUSED) {
     isPlaying = false;
     updatePlayPauseButton();
     stopProgressUpdate();
     showEqualizer(false);
+    updateMediaSessionState('paused');
+  }
+}
+
+// تحديث حالة Media Session
+function updateMediaSessionState(state) {
+  if ('mediaSession' in navigator) {
+    navigator.mediaSession.playbackState = state;
   }
 }
 
@@ -211,6 +226,19 @@ function updateProgress() {
     }
     document.getElementById('currentTime').textContent = formatTime(currentTime);
     document.getElementById('duration').textContent = formatTime(duration);
+    
+    // تحديث موضع التشغيل في Media Session
+    if ('mediaSession' in navigator && 'setPositionState' in navigator.mediaSession) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: duration,
+          playbackRate: player.getPlaybackRate ? player.getPlaybackRate() : 1,
+          position: currentTime
+        });
+      } catch (err) {
+        // تجاهل الأخطاء
+      }
+    }
   }
 }
 

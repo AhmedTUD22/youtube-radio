@@ -73,10 +73,45 @@ self.addEventListener('push', (event) => {
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
 
-  if (event.action === 'open') {
-    event.waitUntil(
-      clients.openWindow('/')
-    );
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true })
+      .then((clientList) => {
+        // البحث عن نافذة مفتوحة
+        for (let client of clientList) {
+          if (client.url.includes(self.location.origin) && 'focus' in client) {
+            return client.focus();
+          }
+        }
+        // فتح نافذة جديدة إذا لم توجد
+        if (clients.openWindow) {
+          return clients.openWindow('/');
+        }
+      })
+  );
+});
+
+// معالجة رسائل من الصفحة الرئيسية
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'KEEP_ALIVE') {
+    // إبقاء Service Worker نشط
+    event.waitUntil(Promise.resolve());
+  }
+  
+  if (event.data && event.data.type === 'UPDATE_MEDIA_SESSION') {
+    // تحديث Media Session من Service Worker
+    const { title, artist, artwork } = event.data;
+    
+    // يمكن استخدام هذا لإرسال إشعارات
+    if (Notification.permission === 'granted') {
+      self.registration.showNotification(title, {
+        body: `يتم التشغيل: ${artist}`,
+        icon: artwork,
+        badge: '/icon-192.png',
+        tag: 'now-playing',
+        requireInteraction: false,
+        silent: true
+      });
+    }
   }
 });
 

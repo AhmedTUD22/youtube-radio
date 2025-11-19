@@ -269,6 +269,21 @@ io.on('connection', (socket) => {
     }
   });
   
+  // تشغيل من القائمة
+  socket.on('playFromQueue', (index) => {
+    if (!socket.currentRoom) return;
+    
+    const room = rooms.get(socket.currentRoom);
+    if (room && index >= 0 && index < room.queue.length) {
+      // نقل الأغنية المختارة للبداية
+      const selectedVideo = room.queue.splice(index, 1)[0];
+      room.queue.unshift(selectedVideo);
+      
+      // تشغيل الأغنية
+      playNextInRoom(socket.currentRoom);
+    }
+  });
+  
   // حذف من القائمة
   socket.on('removeFromQueue', (index) => {
     if (!socket.currentRoom) return;

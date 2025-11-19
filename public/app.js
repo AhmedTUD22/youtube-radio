@@ -99,15 +99,6 @@ function playVideo(videoData) {
     player.loadVideoById(videoData.id);
     updateVideoInfo(videoData);
     updateStatus('🎵 يتم التشغيل الآن...');
-    
-    // تفعيل جميع أنظمة التشغيل في الخلفية
-    if (window.backgroundPlaybackManager && !window.backgroundPlaybackManager.isActive) {
-      window.backgroundPlaybackManager.init();
-    }
-    
-    if (window.enhancedBackgroundAudio && !window.enhancedBackgroundAudio.isEnabled) {
-      window.enhancedBackgroundAudio.enable();
-    }
   } else {
     setTimeout(() => playVideo(videoData), 500);
   }
@@ -149,17 +140,25 @@ function updateQueue(queue) {
     queueList.innerHTML = '<li class="empty-queue">📭 القائمة فارغة - أضف فيديو للبدء!</li>';
   } else {
     queueList.innerHTML = queue.map((video, index) => `
-      <li data-index="${index}">
+      <li data-index="${index}" onclick="playFromQueue(${index})" style="cursor: pointer;" title="اضغط للتشغيل">
         <img src="${video.thumbnail}" alt="${video.title}">
         <div class="queue-item-info">
           <div class="queue-item-title">${video.title}</div>
           <div class="queue-item-channel">${video.channel || 'قناة يوتيوب'}</div>
         </div>
-        <button class="remove-btn" onclick="removeFromQueue(${index})">✕</button>
+        <button class="remove-btn" onclick="event.stopPropagation(); removeFromQueue(${index})">✕</button>
       </li>
     `).join('');
   }
 }
+
+// دالة جديدة لتشغيل أغنية من القائمة
+function playFromQueue(index) {
+  socket.emit('playFromQueue', index);
+  showNotification('▶️ جاري التشغيل...', 'success');
+}
+
+window.playFromQueue = playFromQueue;
 
 function updateOnlineUsers(count) {
   document.getElementById('onlineCount').textContent = count;
@@ -1206,64 +1205,17 @@ document.addEventListener('visibilitychange', async () => {
   }
 });
 
-// ===== تحسينات إضافية للتشغيل في الخلفية =====
+// ===== التشغيل في الخلفية - حل بسيط =====
 
-// مراقبة حالة المشغل بشكل مستمر
-setInterval(() => {
-  if (isPlaying && isPlayerReady && player) {
-    try {
-      const state = player.getPlayerState();
-      // إذا كان يجب أن يكون قيد التشغيل لكنه متوقف
-      if (state !== YT.PlayerState.PLAYING && state !== YT.PlayerState.BUFFERING) {
-        console.log('🔄 اكتشاف توقف غير متوقع - إعادة التشغيل');
-        player.playVideo();
-      }
-    } catch (err) {
-      console.warn('⚠️ خطأ في فحص حالة المشغل:', err);
+// إعادة التشغيل عند العودة من الخلفية
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && isPlaying && isPlayerReady && player) {
+    const state = player.getPlayerState();
+    if (state !== YT.PlayerState.PLAYING) {
+      player.playVideo();
     }
   }
-}, 3000);
-
-// معالجة أحداث النظام
-document.addEventListener('pause', () => {
-  console.log('⚠️ حدث pause - محاولة الاستمرار');
-  if (isPlaying && isPlayerReady && player) {
-    setTimeout(() => player.playVideo(), 100);
-  }
-}, true);
-
-document.addEventListener('freeze', () => {
-  console.log('⚠️ حدث freeze - محاولة الاستمرار');
-  if (isPlaying && isPlayerReady && player) {
-    setTimeout(() => player.playVideo(), 100);
-  }
-}, true);
-
-// منع توقف الصفحة
-let lastActivity = Date.now();
-setInterval(() => {
-  lastActivity = Date.now();
-}, 1000);
-
-// إشعار المستخدم عند التشغيل في الخلفية
-function showBackgroundNotification() {
-  if ('Notification' in window && Notification.permission === 'granted' && document.hidden) {
-    new Notification('راديو يوتيوب', {
-      body: currentVideoData ? `يتم تشغيل: ${currentVideoData.title}` : 'التشغيل مستمر في الخلفية',
-      icon: currentVideoData ? currentVideoData.thumbnail : '/icon-192.png',
-      tag: 'background-playback',
-      requireInteraction: false,
-      silent: true
-    });
-  }
-}
-
-// إظهار إشعار كل دقيقة أثناء التشغيل في الخلفية
-setInterval(() => {
-  if (isPlaying && document.hidden) {
-    showBackgroundNotification();
-  }
-}, 60000);
+});
 
 // ===== Background Sync - مزامنة في الخلفية =====
 if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {

@@ -99,6 +99,11 @@ function playVideo(videoData) {
     player.loadVideoById(videoData.id);
     updateVideoInfo(videoData);
     updateStatus('🎵 يتم التشغيل الآن...');
+    
+    // تفعيل التشغيل في الخلفية
+    if (window.backgroundAudio) {
+      window.backgroundAudio.enable();
+    }
   } else {
     setTimeout(() => playVideo(videoData), 500);
   }
@@ -1214,21 +1219,7 @@ function initAudioElement() {
   }
 }
 
-// تفعيل عند بدء التشغيل
-function playVideo(videoData) {
-  if (isPlayerReady) {
-    currentVideoData = videoData;
-    player.loadVideoById(videoData.id);
-    updateVideoInfo(videoData);
-    updateStatus('🎵 يتم التشغيل الآن...');
-    
-    // تفعيل Audio Focus
-    initAudioElement();
-    requestWakeLock();
-  } else {
-    setTimeout(() => playVideo(videoData), 500);
-  }
-}
+// تم نقل هذه الدالة للأعلى - لا حاجة للتكرار
 
 // ===== Background Sync - مزامنة في الخلفية =====
 if ('serviceWorker' in navigator && 'sync' in ServiceWorkerRegistration.prototype) {

@@ -1,0 +1,21 @@
+{
+  "name": "youtube-radio",
+  "version": "2.0.0",
+  "description": "راديو يوتيوب مع قائمة انتظار مشتركة ومشغل متقدم",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step required'"
+  },
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "axios": "^1.6.0",
+    "youtube-search-api": "^1.2.0"
+  }
+}

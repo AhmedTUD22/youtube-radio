@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>راديو يوتيوب - Radio YouTube</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="logo.svg">
+  <link rel="icon" type="image/png" sizes="16x16" href="logo.svg">
+  
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+  
+  <!-- Theme Color -->
+  <meta name="theme-color" content="#667eea">
+  <meta name="msapplication-TileColor" content="#667eea">
+  
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="logo.svg">
+  <link rel="apple-touch-icon" sizes="152x152" href="logo.svg">
+  <link rel="apple-touch-icon" sizes="180x180" href="logo.svg">
+  <link rel="apple-touch-icon" sizes="167x167" href="logo.svg">
+  
+  <!-- Apple Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="راديو يوتيوب">
+  
+  <!-- Mobile Meta Tags -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="application-name" content="راديو يوتيوب">
+  <meta name="msapplication-tap-highlight" content="no">
+  <meta name="format-detection" content="telephone=no">
+  
+  <!-- Microsoft Tiles -->
+  <meta name="msapplication-TileImage" content="logo.svg">
+  <meta name="msapplication-config" content="browserconfig.xml">
+</head>
+<body>
+  <!-- Background Animation -->
+  <div class="bg-animation">
+    <div class="gradient-orb orb-1"></div>
+    <div class="gradient-orb orb-2"></div>
+    <div class="gradient-orb orb-3"></div>
+  </div>
+
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="logo">
+      <img src="logo.svg" alt="راديو يوتيوب" width="40" height="40">
+      <span>راديو يوتيوب</span>
+    </div>
+    
+    <div class="current-room" id="currentRoomInfo" style="display: none;">
+      <div class="room-badge">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20Z"/>
+        </svg>
+        <div class="room-info">
+          <span class="room-name" id="currentRoomName">غرفة</span>
+          <span class="room-id" id="currentRoomId">#XXXXX</span>
+        </div>
+      </div>
+      <div class="room-actions">
+        <button id="deleteRoomBtn" class="delete-room-btn" title="حذف الغرفة" style="display: none;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 6H5H21M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6M8 6V4C8 3 9 2 10 2H14C15 2 16 3 16 4V6"/>
+          </svg>
+        </button>
+        <button id="leaveRoomBtn" class="leave-room-btn" title="مغادرة الغرفة">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9"/>
+            <path d="M16 17L21 12L16 7"/>
+            <path d="M21 12H9"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <button id="installBtn" class="install-btn" style="display: none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M19 9H15V3H9V9H5L12 16L19 9ZM5 18V20H19V18H5Z"/>
+        </svg>
+        تثبيت التطبيق
+      </button>
+      
+      <div class="online-badge">
+        <span class="pulse-dot"></span>
+        <div class="online-info">
+          <span class="online-count" id="onlineCount">0</span>
+          <span class="online-label">في الغرفة</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="search-container">
+        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21L16.65 16.65"/>
+        </svg>
+        <input 
+          type="text" 
+          id="videoUrl" 
+          placeholder="ابحث عن فيديو يوتيوب أو الصق الرابط هنا..."
+          autocomplete="off"
+        >
+        <button id="addBtn" class="add-btn-modern">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>إضافة</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Hero Player Section -->
+    <section class="hero-player">
+      <div class="album-art-container">
+        <div class="album-art-wrapper">
+          <img id="thumbnail" src="" alt="صورة الفيديو" style="display: none;">
+          <div class="placeholder-art" id="placeholderArt">
+            <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+              <circle cx="60" cy="60" r="50" fill="url(#gradientPlaceholder)"/>
+              <path d="M45 35L80 60L45 85V35Z" fill="white" opacity="0.9"/>
+              <defs>
+                <linearGradient id="gradientPlaceholder" x1="0" y1="0" x2="120" y2="120">
+                  <stop offset="0%" stop-color="#667eea"/>
+                  <stop offset="100%" stop-color="#764ba2"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <p class="placeholder-text">في انتظار الموسيقى</p>
+          </div>
+          <div class="vinyl-effect"></div>
+          <div class="glow-effect"></div>
+        </div>
+        <div class="floating-particles">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <div class="track-info">
+        <div class="track-badge">
+          <div class="equalizer-mini" id="equalizerMini">
+            <span></span><span></span><span></span>
+          </div>
+          <span id="status">في انتظار إضافة فيديو</span>
+        </div>
+        <h1 id="videoTitle" class="track-title">اختر أغنيتك المفضلة</h1>
+        <p id="videoChannel" class="track-artist">وابدأ الاستماع الآن</p>
+      </div>
+
+      <div id="player"></div>
+
+      <!-- Progress Bar -->
+      <div class="progress-container">
+        <span id="currentTime" class="time-label">0:00</span>
+        <div class="progress-bar-modern">
+          <div class="progress-fill-modern" id="progressFill"></div>
+          <div class="progress-handle"></div>
+        </div>
+        <span id="duration" class="time-label">0:00</span>
+      </div>
+
+      <!-- Controls -->
+      <div class="player-controls-modern">
+        <button id="shuffleBtn" class="control-btn-modern shuffle-btn" title="عشوائي">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M16 3H21V8M4 20L21 3M21 16V21H16M15 15L21 21M4 4L9 9"/>
+          </svg>
+        </button>
+        
+        <button id="prevBtn" class="control-btn-modern" title="السابق">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M6 6H8V18H6V6ZM9 12L18 6V18L9 12Z"/>
+          </svg>
+        </button>
+        
+        <button id="playPauseBtn" class="control-btn-modern play-btn" title="تشغيل">
+          <svg class="play-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5V19L19 12L8 5Z"/>
+          </svg>
+          <svg class="pause-icon" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" style="display: none;">
+            <path d="M6 4H10V20H6V4ZM14 4H18V20H14V4Z"/>
+          </svg>
+        </button>
+        
+        <button id="nextBtn" class="control-btn-modern" title="التالي">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 18H18V6H16V18ZM6 18L15 12L6 6V18Z"/>
+          </svg>
+        </button>
+        
+        <button id="repeatBtn" class="control-btn-modern repeat-btn" title="إعادة">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 1L21 5L17 9M3 11V9C3 6.79086 4.79086 5 7 5H21M7 23L3 19L7 15M21 13V15C21 17.2091 19.2091 19 17 19H3"/>
+          </svg>
+        </button>
+        
+        <button id="speedBtn" class="control-btn-modern speed-btn" title="السرعة: 1x">
+          <span class="speed-text">1x</span>
+        </button>
+      </div>
+
+      <!-- Volume Control -->
+      <div class="volume-section">
+        <button id="muteBtn" class="volume-btn">
+          <svg class="volume-icon" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M3 9V15H7L12 20V4L7 9H3ZM16.5 12C16.5 10.23 15.48 8.71 14 7.97V16.02C15.48 15.29 16.5 13.77 16.5 12ZM14 3.23V5.29C16.89 6.15 19 8.83 19 12C19 15.17 16.89 17.85 14 18.71V20.77C18.01 19.86 21 16.28 21 12C21 7.72 18.01 4.14 14 3.23Z"/>
+          </svg>
+        </button>
+        <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="70">
+      </div>
+    </section>
+
+    <!-- Tabs Section -->
+    <section class="content-tabs">
+      <div class="tabs-header">
+        <button class="tab-header-btn active" data-tab="queue">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M15 6H3V8H15V6ZM15 10H3V12H15V10ZM3 16H11V14H3V16Z"/>
+          </svg>
+          القائمة (<span id="queueCount">0</span>)
+        </button>
+        <button class="tab-header-btn" data-tab="history">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M13 3C8.03 3 4 7.03 4 12H1L4.89 15.89L4.96 16.03L9 12H6C6 8.13 9.13 5 13 5C16.87 5 20 8.13 20 12C20 15.87 16.87 19 13 19C11.07 19 9.32 18.21 8.06 16.94L6.64 18.36C8.27 19.99 10.51 21 13 21C17.97 21 22 16.97 22 12C22 7.03 17.97 3 13 3Z"/>
+          </svg>
+          التاريخ
+        </button>
+        <button class="tab-header-btn" data-tab="chat">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 2H4C2.9 2 2 2.9 2 4V22L6 18H20C21.1 18 22 17.1 22 16V4C22 2.9 21.1 2 20 2Z"/>
+          </svg>
+          الدردشة
+        </button>
+        <button class="tab-header-btn" data-tab="users">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M16 11C17.66 11 18.99 9.66 18.99 8C18.99 6.34 17.66 5 16 5C14.34 5 13 6.34 13 8C13 9.66 14.34 11 16 11ZM8 11C9.66 11 10.99 9.66 10.99 8C10.99 6.34 9.66 5 8 5C6.34 5 5 6.34 5 8C5 9.66 6.34 11 8 11ZM8 13C5.67 13 1 14.17 1 16.5V19H15V16.5C15 14.17 10.33 13 8 13ZM16 13C15.71 13 15.38 13.02 15.03 13.05C16.19 13.89 17 15.02 17 16.5V19H23V16.5C23 14.17 18.33 13 16 13Z"/>
+          </svg>
+          الأعضاء
+        </button>
+      </div>
+
+      <!-- Queue Tab -->
+      <div class="tab-panel active" id="queueTab">
+        <div class="queue-actions">
+          <button id="clearQueueBtn" class="action-btn" style="display: none;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6H5H21M19 6V20C19 21 18 22 17 22H7C6 22 5 21 5 20V6M8 6V4C8 3 9 2 10 2H14C15 2 16 3 16 4V6"/>
+            </svg>
+            مسح الكل
+          </button>
+          <button id="shareRoomBtn" class="action-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8C19.6569 8 21 6.65685 21 5C21 3.34315 19.6569 2 18 2C16.3431 2 15 3.34315 15 5C15 6.65685 16.3431 8 18 8Z"/>
+              <path d="M6 15C7.65685 15 9 13.6569 9 12C9 10.3431 7.65685 9 6 9C4.34315 9 3 10.3431 3 12C3 13.6569 4.34315 15 6 15Z"/>
+              <path d="M18 22C19.6569 22 21 20.6569 21 19C21 17.3431 19.6569 16 18 16C16.3431 16 15 17.3431 15 19C15 20.6569 16.3431 22 18 22Z"/>
+              <path d="M8.59 13.51L15.42 17.49M15.41 6.51L8.59 10.49"/>
+            </svg>
+            مشاركة
+          </button>
+        </div>
+        <ul id="queueList" class="queue-list-modern"></ul>
+      </div>
+
+      <!-- History Tab -->
+      <div class="tab-panel" id="historyTab">
+        <ul id="historyList" class="history-list"></ul>
+      </div>
+
+      <!-- Chat Tab -->
+      <div class="tab-panel" id="chatTab">
+        <div class="chat-container">
+          <div id="chatMessages" class="chat-messages"></div>
+          <div class="chat-input-container">
+            <input type="text" id="chatInput" placeholder="اكتب رسالة..." maxlength="200">
+            <button id="sendChatBtn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M2.01 21L23 12L2.01 3L2 10L17 12L2 14L2.01 21Z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Users Tab -->
+      <div class="tab-panel" id="usersTab">
+        <ul id="usersList" class="users-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="notification" class="toast-notification"></div>
+
+  <!-- Room Selection Modal -->
+  <div id="roomModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>🎵 اختر غرفة أو أنشئ واحدة جديدة</h2>
+        <p>كل غرفة لها قائمة تشغيل خاصة</p>
+      </div>
+
+      <div class="modal-tabs">
+        <button class="tab-btn active" data-tab="join">الانضمام لغرفة</button>
+        <button class="tab-btn" data-tab="create">إنشاء غرفة جديدة</button>
+      </div>
+
+      <div class="tab-content active" id="joinTab">
+        <div class="rooms-list" id="roomsList">
+          <div class="loading">جاري تحميل الغرف...</div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="createTab">
+        <div class="create-room-form">
+          <div class="form-group">
+            <label>اسمك</label>
+            <input type="text" id="usernameInput" placeholder="مثال: أحمد" maxlength="20">
+          </div>
+          <div class="form-group">
+            <label>اسم الغرفة</label>
+            <input type="text" id="roomNameInput" placeholder="مثال: غرفة الموسيقى العربية" maxlength="30">
+          </div>
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="privateRoomCheck">
+              <span>غرفة خاصة (تتطلب كلمة مرور)</span>
+            </label>
+          </div>
+          <div class="form-group" id="passwordGroup" style="display: none;">
+            <label>كلمة المرور</label>
+            <input type="password" id="roomPasswordInput" placeholder="أدخل كلمة مرور" maxlength="20">
+          </div>
+          <button id="createRoomBtn" class="create-room-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            إنشاء الغرفة
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

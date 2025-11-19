@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- خلفية دائرية -->
+  <circle cx="100" cy="100" r="90" fill="url(#bgGradient)" filter="url(#shadow)"/>
+  
+  <!-- دائرة داخلية شفافة -->
+  <circle cx="100" cy="100" r="70" fill="rgba(255,255,255,0.1)"/>
+  
+  <!-- أيقونة التشغيل (مثلث) -->
+  <path d="M 75 55 L 145 100 L 75 145 Z" fill="white" filter="url(#shadow)"/>
+  
+  <!-- موجات صوتية -->
+  <path d="M 130 70 Q 145 85 145 100 Q 145 115 130 130" 
+        stroke="rgba(255,255,255,0.4)" 
+        stroke-width="4" 
+        fill="none" 
+        stroke-linecap="round"/>
+  <path d="M 140 60 Q 160 80 160 100 Q 160 120 140 140" 
+        stroke="rgba(255,255,255,0.3)" 
+        stroke-width="4" 
+        fill="none" 
+        stroke-linecap="round"/>
+  <path d="M 150 50 Q 175 75 175 100 Q 175 125 150 150" 
+        stroke="rgba(255,255,255,0.2)" 
+        stroke-width="4" 
+        fill="none" 
+        stroke-linecap="round"/>
+  
+  <!-- نص -->
+  <text x="100" y="185" 
+        font-family="Arial, sans-serif" 
+        font-size="16" 
+        font-weight="bold" 
+        fill="white" 
+        text-anchor="middle">
+    راديو YT
+  </text>
+</svg>

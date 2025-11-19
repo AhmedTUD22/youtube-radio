@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>توليد أيقونات راديو يوتيوب</title>
+  <style>
+    body {
+      font-family: 'Cairo', Arial, sans-serif;
+      background: #0f0f23;
+      color: white;
+      padding: 40px;
+      text-align: center;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    canvas {
+      border: 2px solid #667eea;
+      border-radius: 20px;
+      margin: 20px;
+      box-shadow: 0 10px 40px rgba(102, 126, 234, 0.5);
+    }
+    button {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      margin: 10px;
+      transition: all 0.3s;
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+    }
+    .info {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎵 توليد أيقونات راديو يوتيوب</h1>
+    <div class="info">
+      <p>اضغط على الأزرار لتحميل الأيقونات بأحجام مختلفة</p>
+    </div>
+
+    <h2>أيقونة 192x192</h2>
+    <canvas id="icon192" width="192" height="192"></canvas>
+    <br>
+    <button onclick="downloadIcon('icon192', 'icon-192.png')">تحميل 192x192</button>
+
+    <h2>أيقونة 512x512</h2>
+    <canvas id="icon512" width="512" height="512"></canvas>
+    <br>
+    <button onclick="downloadIcon('icon512', 'icon-512.png')">تحميل 512x512</button>
+
+    <h2>أيقونة Apple Touch 180x180</h2>
+    <canvas id="iconApple" width="180" height="180"></canvas>
+    <br>
+    <button onclick="downloadIcon('iconApple', 'apple-touch-icon.png')">تحميل Apple Icon</button>
+
+    <h2>Favicon 32x32</h2>
+    <canvas id="favicon" width="32" height="32"></canvas>
+    <br>
+    <button onclick="downloadIcon('favicon', 'favicon.png')">تحميل Favicon</button>
+  </div>
+
+  <script>
+    function drawIcon(canvasId, size) {
+      const canvas = document.getElementById(canvasId);
+      const ctx = canvas.getContext('2d');
+      
+      // خلفية متدرجة
+      const gradient = ctx.createLinearGradient(0, 0, size, size);
+      gradient.addColorStop(0, '#667eea');
+      gradient.addColorStop(1, '#764ba2');
+      
+      // رسم الخلفية
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, size, size);
+      
+      // رسم دائرة داخلية
+      const centerX = size / 2;
+      const centerY = size / 2;
+      const radius = size * 0.35;
+      
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.fill();
+      
+      // رسم أيقونة التشغيل (مثلث)
+      const triangleSize = size * 0.25;
+      const triangleX = centerX - triangleSize * 0.2;
+      const triangleY = centerY;
+      
+      ctx.beginPath();
+      ctx.moveTo(triangleX, triangleY - triangleSize);
+      ctx.lineTo(triangleX + triangleSize * 1.5, triangleY);
+      ctx.lineTo(triangleX, triangleY + triangleSize);
+      ctx.closePath();
+      ctx.fillStyle = 'white';
+      ctx.fill();
+      
+      // إضافة ظل للمثلث
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = size * 0.02;
+      ctx.shadowOffsetX = size * 0.01;
+      ctx.shadowOffsetY = size * 0.01;
+      ctx.fill();
+      
+      // رسم موجات صوتية
+      ctx.shadowColor = 'transparent';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.lineWidth = size * 0.015;
+      
+      for (let i = 0; i < 3; i++) {
+        const waveRadius = radius + (i + 1) * (size * 0.08);
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, waveRadius, -Math.PI / 4, Math.PI / 4);
+        ctx.stroke();
+      }
+      
+      // إضافة نص (اختياري للأحجام الكبيرة)
+      if (size >= 192) {
+        ctx.font = `bold ${size * 0.08}px Arial`;
+        ctx.fillStyle = 'white';
+        ctx.textAlign = 'center';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+        ctx.shadowBlur = size * 0.01;
+        ctx.fillText('راديو YT', centerX, size * 0.9);
+      }
+    }
+
+    function downloadIcon(canvasId, filename) {
+      const canvas = document.getElementById(canvasId);
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // رسم جميع الأيقونات عند تحميل الصفحة
+    window.onload = () => {
+      drawIcon('icon192', 192);
+      drawIcon('icon512', 512);
+      drawIcon('iconApple', 180);
+      drawIcon('favicon', 32);
+    };
+  </script>
+</body>
+</html>
